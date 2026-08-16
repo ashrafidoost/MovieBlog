@@ -1,14 +1,37 @@
 import { posts } from "@/data/posts";
+import Link from "next/link";
 
-export default function Posts() {
+export default async function Posts({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    [key: string]: string | string[] | undefined;
+  }>;
+}) {
+  const criteria = (await searchParams).criteria;
+  const resolvedPosts =
+    typeof criteria === `string`
+      ? posts.filter((post) =>
+          post.title.toLowerCase().includes(criteria.toLowerCase()),
+        )
+      : posts;
+
+  const resolvedHeading =
+    typeof criteria === `string` ? `Posts for ${criteria}` : `Posts`;
+
   return (
     <main>
-      <h2>Posts</h2>
+      <h2>{resolvedHeading}</h2>
       <ul>
-        {posts.map((post) => (
+        {resolvedPosts.map((post) => (
           <li key={post.id}>
-            <h3>{post.title}</h3>
-            <p>{post.description}</p>
+            <Link
+              href={`/posts/${post.id}`}
+              style={{ color: "blue", textDecoration: "underline" }}
+            >
+              {post.title}
+            </Link>
+            <p> &nbsp;&nbsp;&nbsp;&nbsp;&bull; {post.description}</p>
           </li>
         ))}
       </ul>
